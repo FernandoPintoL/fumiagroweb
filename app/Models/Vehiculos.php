@@ -14,7 +14,7 @@ class Vehiculos extends Model
     protected $fillable = [
         'placa',
         'detalle',
-        'tipo_vehiculo',
+        'tipo_vehiculo_id',
         'created_at',
         'updated_at'
     ];

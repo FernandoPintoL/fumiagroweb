@@ -55,8 +55,8 @@ class IngresantesController extends Controller
     public function store(StoreIngresantesRequest $request)
     {
         try {
-            $data = $this->model::create($request->validated());
-            return ApiResponse::success($data, 'Ingresante creado exitosamente', 201);
+            $data = $this->model::create($request->all());
+            return ApiResponse::success($data, 'Ingresante creado exitosamente', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error al crear el ingresante', 500, ['exception' => $e->getMessage()]);
         }

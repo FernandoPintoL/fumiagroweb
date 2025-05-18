@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Models\DetalleIngresos;
 use App\Http\Requests\StoreDetalleIngresosRequest;
 use App\Http\Requests\UpdateDetalleIngresosRequest;
+use Illuminate\Support\Facades\Request;
 
 class DetalleIngresosController extends Controller
 {
@@ -15,6 +16,10 @@ class DetalleIngresosController extends Controller
     {
         $this->model = DetalleIngresos::class;
         $this->ruta = 'DetalleIngresos';
+    }
+    public function query(Request $request)
+    {
+
     }
     /**
      * Display a listing of the resource.
@@ -39,7 +44,7 @@ class DetalleIngresosController extends Controller
     {
         try {
             $data = $this->model::create($request->validated());
-            return ApiResponse::success($data, 'Detalle de ingreso creado exitosamente', 201);
+            return ApiResponse::success($data, 'Detalle de ingreso creado exitosamente', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error Exception', 500, ['exception' => $e->getMessage()]);
         }

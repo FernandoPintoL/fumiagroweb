@@ -22,8 +22,7 @@ class GaleriaVehiculosController extends Controller
         try {
             $search = $request->input('query', '');
             $datas = $this->model::query()
-                ->where('name', 'LIKE', "%{$search}%")
-                ->orWhere('detalle', 'LIKE', "%{$search}%")
+                ->where('vehiculo_id', $search)
                 ->orderBy('id', 'desc')
                 ->get();
             return ApiResponse::success($datas, 'Consulta exitosa', 200);
@@ -64,15 +63,19 @@ class GaleriaVehiculosController extends Controller
         try {
             //guadar el archivo en una carpeta ingresantes
             $file = $request->file('file');
-            $path = $file->store('vehiculos', 'public');
-            //guardar en la base de datos
+            $vehiculoId = $request->input('id');
+            $timestamp = now()->timestamp;
+            $extension = $file->getClientOriginalExtension();
+            $filename = "{$timestamp}_vehiculo_{$vehiculoId}.{$extension}";
+            $path = $file->storeAs('vehiculos', $filename, 'public');
+
             $galeria = new GaleriaVehiculos();
-            $galeria->vehiculo_id = $request->input('vehiculo_id');
+            $galeria->vehiculo_id = $vehiculoId;
             $galeria->detalle = $request->input('detalle');
             $galeria->photo_path = $path;
             $galeria->save();
             //retornar la respuesta
-            return ApiResponse::success($galeria, 'Archivo subido exitosamente', 201);
+            return ApiResponse::success($galeria, 'Archivo subido exitosamente', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error Exception', 500, ['exception' => $e->getMessage()]);
         }

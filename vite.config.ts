@@ -30,7 +30,7 @@ export default defineConfig({
     },
     server:{
         host: '192.168.100.21',
-        port: 5173,
+        port: 5174,
         cors: true,
     }
 });

@@ -37,8 +37,8 @@ $controllers = [
 ];
 
 Route::post('/app/login', [AuthenticatedController::class, 'store'])->name('app.login');
-Route::post('/app/galeria-ingresantes/updload', [GaleriaIngresantesController::class, 'upload'])->name('app.galeria.ingresantes.upload');
-Route::post('/app/galeria-visitantes/updload', [GaleriaIngresantesController::class, 'upload'])->name('app.galeria.visitantantes.upload');
+Route::post('/app/galeria-ingresantes/upload', [GaleriaIngresantesController::class, 'upload'])->name('app.galeria.ingresantes.upload');
+Route::post('/app/galeria-vehiculos/upload', [GaleriaVehiculosController::class, 'upload'])->name('app.galeria.vehiculos.upload');
 
 foreach ($controllers as $key => $controller) {
     Route::post("/app/$key/store", [$controller, 'store'])->name("app.$key.store");

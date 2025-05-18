@@ -56,8 +56,8 @@ class VehiculosController extends Controller
     public function store(StoreVehiculosRequest $request)
     {
         try {
-            $data = $this->model::create($request->validated());
-            return ApiResponse::success($data, 'Vehiculo creado exitosamente', 201);
+            $data = $this->model::create($request->all());
+            return ApiResponse::success($data, 'Vehiculo creado exitosamente', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error Exception', 500, ['exception' => $e->getMessage()]);
         }

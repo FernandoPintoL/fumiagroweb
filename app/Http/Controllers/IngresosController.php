@@ -12,31 +12,53 @@ class IngresosController extends Controller
 {
     public $model;
     public $ruta;
+
     public function __construct()
     {
         $this->model = Ingresos::class;
         $this->ruta = 'Ingresos';
     }
+
     public function query(Request $request)
     {
         try {
             $search = $request->input('query', '');
-            $datas = $this->model::query()
-                ->where('status_autorizacion', 'LIKE', "%{$search}%")
-                ->orWhere('detalle', 'LIKE', "%{$search}%")
-                ->orWhere('propiedad_id', 'LIKE', "%{$search}%")
-                ->orWhere('sub_propiedad_id', 'LIKE', "%{$search}%")
-                ->orWhere('guardia_id', 'LIKE', "%{$search}%")
-                ->orWhere('vehiculo_id', 'LIKE', "%{$search}%")
-                ->orWhere('ingresante_id', 'LIKE', "%{$search}%")
-                ->orWhere('user_id', 'LIKE', "%{$search}%")
-                ->orderBy('id', 'desc')
+            $fechaInicio = $request->input('fecha_inicio');
+            $fechaFin = $request->input('fecha_fin');
+            $offset = $request->input('offset', 0); // desde qué registro empezar
+            $limit = $request->input('limit', 10);  // cuántos registros traer
+
+
+            $query = $this->model::with(['propiedad', 'subPropiedad', 'guardia', 'vehiculo', 'ingresante', 'user', 'detalleIngreso', 'detalleIngreso.statusIngreso'])
+                ->where(function ($q) use ($search) {
+                    $q->where('status_autorizacion', 'LIKE', "%{$search}%")
+                        ->orWhere('detalle', 'LIKE', "%{$search}%")
+                        ->orWhere('propiedad_id', 'LIKE', "%{$search}%")
+                        ->orWhere('sub_propiedad_id', 'LIKE', "%{$search}%")
+                        ->orWhere('guardia_id', 'LIKE', "%{$search}%")
+                        ->orWhere('vehiculo_id', 'LIKE', "%{$search}%")
+                        ->orWhere('ingresante_id', 'LIKE', "%{$search}%")
+                        ->orWhere('user_id', 'LIKE', "%{$search}%");
+                });
+
+            if ($fechaInicio && $fechaFin) {
+                $query->whereBetween('created_at', [$fechaInicio, $fechaFin]);
+            } elseif ($fechaInicio) {
+                $query->whereDate('created_at', '>=', $fechaInicio);
+            } elseif ($fechaFin) {
+                $query->whereDate('created_at', '<=', $fechaFin);
+            }
+
+            $datas = $query->orderBy('id', 'desc')
+                ->skip($offset)
+                ->take($limit)
                 ->get();
             return ApiResponse::success($datas, 'Consulta exitosa', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error Exception', 500, ['exception' => $e->getMessage()]);
         }
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -59,8 +81,8 @@ class IngresosController extends Controller
     public function store(StoreIngresosRequest $request)
     {
         try {
-            $ingreso = Ingresos::create($request->validated());
-            return ApiResponse::success($ingreso, 'Ingreso creado exitosamente', 201);
+            $ingreso = Ingresos::create($request->all());
+            return ApiResponse::success($ingreso, 'Ingreso creado exitosamente', 200);
         } catch (\Exception $e) {
             return ApiResponse::error('Error al crear el ingreso', 500, ['exception' => $e->getMessage()]);
         }
